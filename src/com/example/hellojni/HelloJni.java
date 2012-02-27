@@ -15,6 +15,8 @@
  */
 package com.example.hellojni;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.widget.TextView;
 import android.os.Bundle;
@@ -28,21 +30,30 @@ public class HelloJni extends Activity
     {
         super.onCreate(savedInstanceState);
 
+        
+        String exportdir =  this.getFilesDir().getAbsolutePath() + File.separator+"db" ;
+		
+		new File(exportdir).mkdirs();
+		
         /* Create a TextView and set its content.
          * the text is retrieved by calling a native
          * function.
          */
+        
         TextView  tv = new TextView(this);
-        tv.setText( stringFromJNI() );
+        tv.setText( dbOpen(exportdir) );
         setContentView(tv);
+        
+        
     }
-
+    public native String  dbOpen(String dbpath);
+    
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
      * with this application.
      */
     public native String  stringFromJNI();
-
+    
     /* This is another native method declaration that is *not*
      * implemented by 'hello-jni'. This is simply to show that
      * you can declare as many native methods in your Java code

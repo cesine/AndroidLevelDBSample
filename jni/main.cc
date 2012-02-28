@@ -16,6 +16,7 @@
 
 //leveldb::Benchmark benchTest = new leveldb::Benchmark();
 
+leveldb::DB* db;
 
 extern "C" {
 JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbGet(JNIEnv * env, jobject thiz);
@@ -43,13 +44,27 @@ JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbOpen(JNIEnv* env,
 JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbOpen(JNIEnv* env, jobject thiz, jstring dbpath)
 {
 	const char* path = env->GetStringUTFChars(dbpath,0);
+	LOGI("Opening database");
 	LOGI(path);
-	leveldb::DB* db;
+
 	leveldb::Options options;
 	options.create_if_missing = true;
 	leveldb::Status status = leveldb::DB::Open(options, path, &db);
 	const char* re =  status.ToString().c_str();
 	return env->NewStringUTF(re);
+}
+
+extern "C" {
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbClose(JNIEnv* env, jobject thiz, jstring dbpath);
+
+
+};
+
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbClose(JNIEnv* env, jobject thiz, jstring dbpath)
+{
+	delete db;
+	LOGI("Closed database");
+	return env->NewStringUTF("Closed database");
 }
 extern "C" {
 	JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbDelete(JNIEnv * env, jobject thiz);

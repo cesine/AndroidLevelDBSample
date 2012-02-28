@@ -24,6 +24,8 @@ import android.os.Bundle;
 
 public class HelloJni extends Activity
 {
+	
+	String mDBdir;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -31,22 +33,22 @@ public class HelloJni extends Activity
         super.onCreate(savedInstanceState);
 
         
-        String exportdir =  this.getFilesDir().getAbsolutePath() + File.separator+"db" ;
+        mDBdir =  this.getFilesDir().getAbsolutePath() + File.separator+"db" ;
 		
-		new File(exportdir).mkdirs();
+		new File(mDBdir).mkdirs();
 		
         /* Create a TextView and set its content.
          * the text is retrieved by calling a native
          * function.
          */
         
-        TextView  tv = new TextView(this);
-        tv.setText( dbOpen(exportdir) );
-        setContentView(tv);
+        
+      
         
         
     }
     public native String  dbOpen(String dbpath);
+    public native String  dbClose(String dbpath);
     
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
@@ -74,4 +76,28 @@ public class HelloJni extends Activity
     static {
         System.loadLibrary("leveldb");
     }
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+	}
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		
+		  
+        dbClose(mDBdir);
+	}
+	@Override
+	protected void onResume() {
+		TextView  tv = new TextView(this);
+        tv.setText( dbOpen(mDBdir) );
+        setContentView(tv);
+        
+		super.onResume();
+	}
+    
+    
 }

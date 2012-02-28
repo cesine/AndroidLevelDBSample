@@ -32,21 +32,41 @@ public class HelloJni extends Activity
     {
         super.onCreate(savedInstanceState);
 
-        
+        /*
+         * Use the files dir to store the database /data/data/package..../db
+         */
         mDBdir =  this.getFilesDir().getAbsolutePath() + File.separator+"db" ;
-		
 		new File(mDBdir).mkdirs();
 		
-        /* Create a TextView and set its content.
-         * the text is retrieved by calling a native
-         * function.
-         */
-        
-        
-      
-        
-        
     }
+    
+    @Override
+	protected void onResume() {
+    	/*
+    	 * Sample Database code:
+    	 * Open the database using the path to its directory
+    	 * Insert some keys,
+    	 * Delete a key, 
+    	 * Create a TextView and show the value of a key retrieved from the DB.
+    	 */
+		dbOpen(mDBdir);
+		dbPut("firstkey","this is the value of the first key");
+		dbPut("secondkey","this is the value of the first key");
+		dbPut("keyToDelete","this is the value of the key that i want to delete");
+		dbPut("fourthkey","this is the value of the fourth key");
+		dbDelete("keyToDelete");
+		
+		TextView  tv = new TextView(this);
+		tv.setText( dbGet("fourthkey")  );
+        setContentView(tv);
+        
+        
+		super.onResume();
+	}
+    
+    /*
+     * Methods which wrap LevelDB calls, see jni/main.cc for details
+     */
     public native String  dbOpen(String dbpath);
     public native String  dbClose(String dbpath);
     public native String  dbPut(String key1, String value1);
@@ -60,7 +80,7 @@ public class HelloJni extends Activity
     public native String  stringFromJNI();
     
     /* This is another native method declaration that is *not*
-     * implemented by 'hello-jni'. This is simply to show that
+     * implemented by 'leveldb'. This is simply to show that
      * you can declare as many native methods in your Java code
      * as you want, their implementation is searched in the
      * currently loaded native libraries only the first time
@@ -71,45 +91,24 @@ public class HelloJni extends Activity
      */
     public native String  unimplementedStringFromJNI();
 
-    /* this is used to load the 'hello-jni' library on application
+    /* this is used to load the 'leveldb' library on application
      * startup. The library has already been unpacked into
-     * /data/data/com.example.HelloJni/lib/libhello-jni.so at
+     * /data/data/com.example.HelloJni/lib/libleveldb.so at
      * installation time by the package manager.
      */
     static {
         System.loadLibrary("leveldb");
     }
 
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-	}
+	
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
-		
-		  
-        dbClose(mDBdir);
+		/*
+		 * Close the db in the onPause to not waste memory
+		 */
+		dbClose(mDBdir);
 	}
-	@Override
-	protected void onResume() {
-		TextView  tv = new TextView(this);
-		dbOpen(mDBdir);
-		dbPut("firstkey","this is the value of the first key");
-		dbPut("secondkey","this is the value of the first key");
-		dbPut("keyToDelete","this is the value of the key that i want to delete");
-		dbPut("fourthkey","this is the value of the fourth key");
-		dbDelete("keyToDelete");
-		
-		//tv.setText( dbPut("thisisake","hereisiitsvalue")  );
-		tv.setText( dbGet("keyToDelete")  );
-        setContentView(tv);
-        
-        
-		super.onResume();
-	}
-    
+	
     
 }

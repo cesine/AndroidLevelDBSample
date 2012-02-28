@@ -102,12 +102,29 @@ JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbClose(JNIEnv* env
 	return env->NewStringUTF("Closed database");
 }
 extern "C" {
-JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbDelete(JNIEnv * env, jobject thiz);
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbDelete(JNIEnv * env, jobject thiz, jstring key1);
 };
 
-JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbDelete(JNIEnv * env, jobject thiz)
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbDelete(JNIEnv * env, jobject thiz, jstring key1)
 {
-	return env->NewStringUTF("calling delete");
+
+	LOGI("In the delete ");
+
+	const char* key = env->GetStringUTFChars(key1,0);
+	LOGI("Key");
+	LOGI(key);
+
+	leveldb::Status status = db->Delete(leveldb::WriteOptions(), key);
+
+
+	if (status.ok()) {
+		const char* re =  status.ToString().c_str();
+		return env->NewStringUTF(re);
+	}else{
+		const char* re =  status.ToString().c_str();
+		return env->NewStringUTF(re);
+	}
+
 }
 extern "C" {
 JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_GetProperty(JNIEnv * env, jobject thiz);

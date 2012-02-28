@@ -51,6 +51,7 @@ public class HelloJni extends Activity
     public native String  dbClose(String dbpath);
     public native String  dbPut(String key1, String value1);
     public native String  dbGet(String key1);
+    public native String  dbDelete(String key1);
     
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
@@ -96,8 +97,14 @@ public class HelloJni extends Activity
 	protected void onResume() {
 		TextView  tv = new TextView(this);
 		dbOpen(mDBdir);
+		dbPut("firstkey","this is the value of the first key");
+		dbPut("secondkey","this is the value of the first key");
+		dbPut("keyToDelete","this is the value of the key that i want to delete");
+		dbPut("fourthkey","this is the value of the fourth key");
+		dbDelete("keyToDelete");
+		
 		//tv.setText( dbPut("thisisake","hereisiitsvalue")  );
-		tv.setText( dbGet("thisisake")  );
+		tv.setText( dbGet("keyToDelete")  );
         setContentView(tv);
         
         

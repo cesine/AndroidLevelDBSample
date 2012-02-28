@@ -49,6 +49,8 @@ public class HelloJni extends Activity
     }
     public native String  dbOpen(String dbpath);
     public native String  dbClose(String dbpath);
+    public native String  dbPut(String key1, String value1);
+    public native String  dbGet(String key1);
     
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
@@ -93,8 +95,11 @@ public class HelloJni extends Activity
 	@Override
 	protected void onResume() {
 		TextView  tv = new TextView(this);
-        tv.setText( dbOpen(mDBdir) );
+		dbOpen(mDBdir);
+		//tv.setText( dbPut("thisisake","hereisiitsvalue")  );
+		tv.setText( dbGet("thisisake")  );
         setContentView(tv);
+        
         
 		super.onResume();
 	}

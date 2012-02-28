@@ -19,21 +19,56 @@
 leveldb::DB* db;
 
 extern "C" {
-JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbGet(JNIEnv * env, jobject thiz);
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbGet(JNIEnv * env, jobject thiz, jstring key1);
 };
 
-JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbGet(JNIEnv * env, jobject thiz)
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbGet(JNIEnv * env, jobject thiz, jstring key1)
 {
-	return env->NewStringUTF("calling get");
+
+	LOGI("In the get ");
+
+	const char* key = env->GetStringUTFChars(key1,0);
+	LOGI("Key");
+	LOGI(key);
+
+	std::string value;
+	leveldb::Status status = db->Get(leveldb::ReadOptions(), key, &value);
+
+
+	if (status.ok()) {
+		const char* re =  value.c_str();
+		return env->NewStringUTF(re);
+	}else{
+		const char* re =  status.ToString().c_str();
+		return env->NewStringUTF(re);
+	}
+
 }
 
 extern "C" {
-JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbPut(JNIEnv * env, jobject thiz);
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbPut(JNIEnv * env, jobject thiz, jstring key1, jstring value1);
 };
 
-JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbPut(JNIEnv * env, jobject thiz)
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbPut(JNIEnv * env, jobject thiz, jstring key1, jstring value1)
 {
-	return env->NewStringUTF("calling put");
+	LOGI("In the put ");
+
+	const char* key = env->GetStringUTFChars(key1,0);
+	const char* value = env->GetStringUTFChars(value1,0);
+	LOGI("Key");
+	LOGI(key);
+	LOGI("Value");
+	LOGI(value);
+
+	leveldb::Status status = db->Put(leveldb::WriteOptions(), key, value);
+	if (status.ok()) {
+		const char* re =  status.ToString().c_str();
+		return env->NewStringUTF(value);
+	}else{
+		const char* re =  status.ToString().c_str();
+		return env->NewStringUTF(re);
+	}
+
 }
 extern "C" {
 JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbOpen(JNIEnv* env, jobject thiz, jstring dbpath);
@@ -67,7 +102,7 @@ JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbClose(JNIEnv* env
 	return env->NewStringUTF("Closed database");
 }
 extern "C" {
-	JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbDelete(JNIEnv * env, jobject thiz);
+JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbDelete(JNIEnv * env, jobject thiz);
 };
 
 JNIEXPORT jstring JNICALL Java_com_example_hellojni_HelloJni_dbDelete(JNIEnv * env, jobject thiz)

@@ -1,5 +1,8 @@
 /*
- *
+ * This file contains sample wrappers showing Android Java Developers
+ * who are not familiar with the NDK or JNI how to get data in and out of the
+ * CPP and how to incorporate the sample code in
+ * http://leveldb.googlecode.com/svn/trunk/doc/index.html into their JNI
  */
 #include <string.h>
 #include <jni.h>
@@ -14,7 +17,6 @@
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
-//leveldb::Benchmark benchTest = new leveldb::Benchmark();
 
 leveldb::DB* db;
 

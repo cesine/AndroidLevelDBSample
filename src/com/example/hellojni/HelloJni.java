@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,40 +77,55 @@ public class HelloJni extends Activity
 		tv.setText( dbGet("fourthkey")  );
         setContentView(tv);
         
-        
+        ArrayList<String> keystoquery= new ArrayList<String>();
         try {
         	AssetManager assetManager = getAssets();
     	  	InputStream in = assetManager.open("sample.json");
     	  	BufferedReader sourcefile = new BufferedReader(new InputStreamReader(in, "UTF-8"));
     	  	String contents = "";
     	  	String line = "";
-    	  	int linecount=0;
     	  	while ((line = sourcefile.readLine()) != null) {
-    	  		//contents = contents+"\n"+line;
-    	  		dbPut("element"+linecount, line);
-    	  		linecount++;
+    	  		contents = contents+"\n"+line;
     	  	}
     	  	sourcefile.close();
-    	  	int j = linecount-1;
-			tv.setText( dbGet("element"+j) );
+    	  	JSONObject json = new JSONObject(contents);
+			Iterator<String> keys = json.keys();
+			while (keys.hasNext()) {
+				String key = (String) keys.next();
+				keystoquery.add(key);
+				dbPut(key, json.get(key).toString());
+			}
+	    	   
+			int j = json.length()-1;
+			tv.setText( "element"+j );
 	        setContentView(tv);
-//    	  	JSONArray json = new JSONArray(contents);
-//			for(int i = 0; i< json.length(); i++){
-//				dbPut("element"+i, json.get(i).toString());
-//			}
-//			int j = json.length()-1;
-//			tv.setText( dbGet("element"+j) );
-//	        setContentView(tv);
 	        
 		} catch (IOException e) {
 			Toast.makeText(this, "File read problem"+e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			tv.setText( "File read problem"+e.getLocalizedMessage() );
+	        setContentView(tv);
 		} 
-//        catch (JSONException e) {
-//			Toast.makeText(this, "Json problem"+e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-//		}
+        catch (JSONException e) {
+			Toast.makeText(this, "Json problem"+e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			tv.setText( "JSON problem"+e.getLocalizedMessage() );
+        	setContentView(tv);
+        }
 
-		
-        
+		/*
+		 * Query entries randomly
+		 */
+        long startime = System.currentTimeMillis();
+		int maxkey = keystoquery.size() -1;
+		int querycount = 1000;
+		Random randomGenerator = new Random();
+	    for (int k = 0; k < querycount; k++){
+			int randomKey = randomGenerator.nextInt(maxkey);
+		    String it = dbGet(keystoquery.get(randomKey) );
+		}
+        long endtime = System.currentTimeMillis();
+        long querytime = (endtime-startime);
+        tv.setText( "Random quering of "+querycount+" entries took this many miliseconds: "+querytime );
+    	setContentView(tv);
         
 		super.onResume();
 	}

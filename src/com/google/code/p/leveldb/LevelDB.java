@@ -145,23 +145,23 @@ public class LevelDB extends Activity {
 	/*
 	 * Methods which wrap LevelDB calls, see jni/main.cc for details
 	 */
-	public native String dbOpen(String dbpath);
+	public static native String dbOpen(String dbpath);
 
-	public native String dbClose(String dbpath);
+	public static native String dbClose(String dbpath);
 
-	public native String dbPut(String key1, String value1);
+	public static native String dbPut(String key1, String value1);
 
-	public native String dbGet(String key1);
+	public static native String dbGet(String key1);
 
-	public native String dbDelete(String key1);
+	public static native String dbDelete(String key1);
 	
-	public native String dbDestroy(String dbpath);
+	public static native String dbDestroy(String dbpath);
 
 	/*
 	 * A native method that is implemented by the 'hello-jni' native library,
 	 * which is packaged with this application.
 	 */
-	public native String stringFromJNI();
+	public static native String stringFromJNI();
 
 	/*
 	 * This is another native method declaration that is *not* implemented by
@@ -173,7 +173,7 @@ public class LevelDB extends Activity {
 	 * Trying to call this function will result in a
 	 * java.lang.UnsatisfiedLinkError exception !
 	 */
-	public native String unimplementedStringFromJNI();
+	public static native String unimplementedStringFromJNI();
 
 	/*
 	 * this is used to load the 'leveldb' library on application startup. The

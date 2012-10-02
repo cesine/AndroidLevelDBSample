@@ -25,13 +25,14 @@
     <application android:icon="@drawable/app_notes"
         android:label="@string/app_name"
     >
-        <!-- <provider android:name="com.google.code.p.leveldb.provider.NotePadLevelDBProvider"
-            android:authorities="com.google.provider.NotePad"
-        /> -->
-        
-        <provider android:name="com.google.code.p.leveldb.provider.NotePadSQLiteProvider"
+        <provider android:name="com.google.code.p.leveldb.provider.NotePadLevelDBProvider"
             android:authorities="com.google.provider.NotePad"
         /> 
+        
+        <!-- 
+        <provider android:name="com.google.code.p.leveldb.provider.NotePadSQLiteProvider"
+            android:authorities="com.google.provider.NotePad"
+        />  -->
 
         <activity android:name="NotesList" android:label="@string/title_notes_list">
             <intent-filter>

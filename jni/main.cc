@@ -101,7 +101,7 @@ JNIEXPORT jstring JNICALL Java_com_google_code_p_leveldb_LevelDB_dbPut(JNIEnv * 
 	if (status.ok()) {
 		const char* re =  status.ToString().c_str();
 //		LOGI(re);
-		return env->NewStringUTF(value);
+		return env->NewStringUTF(key);
 	}else{
 		const char* re =  status.ToString().c_str();
 		return env->NewStringUTF("NotFound");

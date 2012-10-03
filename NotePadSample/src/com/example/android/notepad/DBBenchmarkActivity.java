@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -169,14 +170,17 @@ public class DBBenchmarkActivity extends Activity {
 		 contents = contents + "\n" + line;
 		 }
 			sourcefile.close();
-			JSONObject json = new JSONObject(contents);
-			Iterator<String> keys = json.keys();
-			while (keys.hasNext()) {
-				String key = (String) keys.next();
+			JSONArray json = new JSONArray(contents);
+
+			for (int i = 0; i < json.length(); ++i) {
+			    JSONObject rec = json.getJSONObject(i);
+			    String key = rec.getString("id");
+			    String value = rec.toString();
+
 				keystoquery.add(key);
 				
 				mContentValues.put("key", key);
-				mContentValues.put("value", json.get(key).toString());
+				mContentValues.put("value", value);
 				mUri = cr.insert(LevelDBProvider.CONTENT_URI, mContentValues);
 			}
 

@@ -1,0 +1,47 @@
+{
+   "_id": "33EE7A7F-45DF-40FD-B847-D46185A2AE0D",
+   "_rev": "6-6993acafd1a0571e3e8c9f47471df84d",
+   "utterance": "tusunayawan",
+   "morphemes": "my morphemes",
+   "gloss": "my gloss",
+   "translation": "my translation",
+   "grammaticalTags": "impulsative",
+   "sessionID": 0,
+   "status": {
+       "statuses": [
+           {
+               "id": 1,
+               "label": "Checked"
+           },
+           {
+               "id": 2,
+               "label": "To be checked",
+               "selected": true
+           },
+           {
+               "id": 3,
+               "label": "Deleted"
+           }
+       ],
+       "active": 0,
+       "defaultStatus": 0
+   },
+   "datumField": {
+       "sessionID": 0,
+       "user": "User",
+       "informant": "",
+       "language": "Language",
+       "languageFamily": "Family",
+       "dialect": "",
+       "date": "Mon Jun 04 2012 16:07:24 GMT-0400 (EDT)",
+       "goal": ""
+   },
+   "datumTag": {
+       "script": "",
+       "context": "",
+       "semanticDenotation": "",
+       "ipa": "",
+       "segmentation": "tusu-naya-wa-n",
+       "other": ""
+   }
+}

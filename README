@@ -10,15 +10,17 @@ $ git pull upstream android
 Create new Android project
  select from source
 
-Create an external builder
- There is a tutorial which shows the common set up for C++ development in Android here:
- http://blog.jayway.com/2011/10/13/getting-started-with-android-ndk/
+Create the C++ facet
+ http://mhandroid.wordpress.com/2011/01/23/using-eclipse-for-android-cc-development/
 
 Clean
 
 Run
 
-Open the View for LogCat, and add a filter for AndroidLevelDB to see the sample LevelDB debug output.
+Open the View for LogCat, and add a filter for AndroidLevelDB to see the sample LevelDB debug output, add a filter for DBbenchmark if you want to see the benchmark output.
+
+
+
 
 ====LevelDB Readme====
 

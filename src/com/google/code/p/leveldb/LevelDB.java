@@ -1,41 +1,51 @@
-/*
- * Copyright (C) 2009 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.google.code.p.leveldb;
 
+import java.io.File;
+
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.CharArrayBuffer;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.database.DataSetObserver;
+import android.net.Uri;
+import android.os.Bundle;
+
 public class LevelDB {
+	public String mDBdir;
+	public Context mContext;
+	public String mDatabaseName;
+	public int mDatabaseVersion;
+	public int mContentCount = 0;
+	public LevelDB(Context context, String databasename, int databaseversion) {
+		mContext = context;
+		mDatabaseName = databasename;
+		mDatabaseVersion = databaseversion;
+		mDBdir = mContext.getFilesDir().getAbsolutePath() + File.separator
+				+ mDatabaseName;
+		new File(mDBdir).mkdirs();
+	}
 	/*
 	 * Methods which wrap LevelDB calls, see jni/main.cc for details
 	 */
-	public static native String dbOpen(String dbpath);
+	public native String dbOpen(String dbpath);
 
-	public static native String dbClose(String dbpath);
+	public native String dbClose(String dbpath);
 
-	public static native String dbPut(String key1, String value1);
+	public native String dbPut(String key1, String value1);
 
-	public static native String dbGet(String key1);
+	public native String dbGet(String key1);
 
-	public static native String dbDelete(String key1);
-	
-	public static native String dbDestroy(String dbpath);
+	public native String dbDelete(String key1);
+
+	public native String dbDestroy(String dbpath);
 
 	/*
 	 * A native method that is implemented by the 'hello-jni' native library,
 	 * which is packaged with this application.
 	 */
-	public static native String stringFromJNI();
+	public native String stringFromJNI();
 
 	/*
 	 * This is another native method declaration that is *not* implemented by
@@ -47,15 +57,15 @@ public class LevelDB {
 	 * Trying to call this function will result in a
 	 * java.lang.UnsatisfiedLinkError exception !
 	 */
-	public static native String unimplementedStringFromJNI();
+	public native String unimplementedStringFromJNI();
 
 	/*
-	 * this is used to load the 'leveldb' library on application startup. The
+	 * This is used to load the 'leveldb' library on application startup. The
 	 * library has already been unpacked into
 	 * /data/data/com.example.HelloJni/lib/libleveldb.so at installation time by
 	 * the package manager.
 	 */
-	static {
+	{
 		System.loadLibrary("leveldb");
 	}
 }

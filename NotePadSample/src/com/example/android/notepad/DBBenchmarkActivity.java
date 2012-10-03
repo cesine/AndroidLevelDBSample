@@ -14,31 +14,108 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.code.p.leveldb.LevelDB;
+import com.google.code.p.leveldb.provider.LevelDBProvider;
+import com.google.code.p.leveldb.provider.NotePad.Notes;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.res.AssetManager;
+import android.database.Cursor;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 
 public class DBBenchmarkActivity extends Activity {
-	String mDBdir;
-	LevelDB db;
+	// String mDBdir;
+	// LevelDB db;
+
+	private static final String TAG = "DBbenchmark";
+
+	private static final String[] PROJECTION = new String[] { "key", // 0
+			"value" // 1
+	};
+
+	Cursor mCursor;
+	Uri mUri;
+	ContentValues mContentValues;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		/*
-		 * Use the files dir to store the database /data/data/package..../db
-		 */
-		mDBdir = this.getFilesDir().getAbsolutePath() + File.separator + "db";
-		new File(mDBdir).mkdirs();
-		
-		db = new LevelDB(this, "db", 1);
-		db.onCreate(null);
+		// Get content provider and cursor
+		ContentResolver cr = getContentResolver();
+		Log.d(TAG, Settings.System.CONTENT_URI.toString());
+		Log.d(TAG, LevelDBProvider.CONTENT_URI.toString());
+
+		Cursor cursor = cr.query(Settings.System.CONTENT_URI, null, null, null,
+				null);
+		if (cursor != null) {
+			Log.d(TAG, cursor.getColumnNames()[0]);
+		}
+		Cursor c = cr
+				.query(LevelDBProvider.CONTENT_URI, null, null, null, null);
+		if (c != null) {
+			Log.d(TAG, c.getColumnNames()[0]);
+		}
+
+		ContentValues cv = new ContentValues();
+		cv.put("key", "thisisthekey");
+		cv.put("value", "somestuff");
+		Uri result = cr.insert(LevelDBProvider.CONTENT_URI, cv);
+		Log.d(TAG, result.toString());
+
+		int deletedcount = cr.delete(result, null, null);
+		Log.d(TAG, "Deleted :" + deletedcount);
+
+		deletedcount = cr.delete(result.withAppendedPath(result, "1"), null,
+				null);
+		Log.d(TAG, "Deleted :" + deletedcount);
+
+		Cursor cdeleted = cr.query(LevelDBProvider.CONTENT_URI, null, null,
+				null, null);
+		if (cdeleted != null) {
+			cdeleted.moveToFirst();
+			String deletedvalue = cdeleted.getString(1);
+			if (deletedvalue != null && !"".equals(deletedvalue)) {
+				Log.d(TAG, "Value:" + deletedvalue + ":");
+			} else {
+				Log.d(TAG, "No value");
+			}
+			Log.e(TAG,
+					"The cursor was not null, and it was supposed to be null.");
+		}
+
+		mContentValues = new ContentValues();
+		mContentValues.put("key", "thisisanewkey");
+		mContentValues.put("value", "somestuff");
+		mUri = cr.insert(LevelDBProvider.CONTENT_URI, mContentValues);
+		mCursor = cr.query(mUri, null, null, null, null);
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+			String value = mCursor.getString(1);
+			Log.d(TAG, "Successfully inserted and queried: " + value);
+		} else {
+			Log.e(TAG, "The cursor was null, and its not supposed to be null.");
+		}
+
+		mContentValues.put("value", "updatedvalue");
+		int updatedcount = cr.update(LevelDBProvider.CONTENT_URI,
+				mContentValues, null, null);
+
+		mCursor = cr.query(mUri, null, null, null, null);
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+			String value = mCursor.getString(1);
+			Log.d(TAG, "Successfully updated and queried: " + value);
+		} else {
+			Log.e(TAG, "The cursor was null, and its not supposed.");
+		}
 	}
 
 	@Override
@@ -48,37 +125,59 @@ public class DBBenchmarkActivity extends Activity {
 		 * directory Insert some keys, Delete a key, Create a TextView and show
 		 * the value of a key retrieved from the DB.
 		 */
-		db.dbDestroy(mDBdir);
-		db.dbOpen(mDBdir);
-		db.dbPut("firstkey", "this is the value of the first key");
-		db.dbPut("secondkey", "this is the value of the first key");
-		db.dbPut("keyToDelete",
+		ContentResolver cr = getContentResolver();
+
+		mContentValues = new ContentValues();
+		mContentValues.put("key", "firstkey");
+		mContentValues.put("value", "this is the value of the first key");
+		mUri = cr.insert(LevelDBProvider.CONTENT_URI, mContentValues);
+
+		mContentValues.put("key", "secondkey");
+		mContentValues.put("value", "this is the value of the second key");
+		mUri = cr.insert(LevelDBProvider.CONTENT_URI, mContentValues);
+
+		mContentValues.put("key", "keyToDelete");
+		mContentValues.put("value",
 				"this is the value of the key that i want to delete");
-		db.dbPut("fourthkey", "this is the value of the fourth key");
-		db.dbDelete("keyToDelete");
+		mUri = cr.insert(LevelDBProvider.CONTENT_URI, mContentValues);
+
+		mContentValues.put("key", "fourthkey");
+		mContentValues.put("value", "this is the value of the fourth key");
+		mUri = cr.insert(LevelDBProvider.CONTENT_URI, mContentValues);
+
+		int deletedcount = cr.delete(mUri, null, null);
 
 		TextView tv = new TextView(this);
-		tv.setText(db.dbGet("fourthkey"));
-		setContentView(tv);
 
-		ArrayList<String> keystoquery = new ArrayList<String>();
-		try {
-			AssetManager assetManager = getAssets();
-			InputStream in = assetManager.open("sample.json");
-			BufferedReader sourcefile = new BufferedReader(
-					new InputStreamReader(in, "UTF-8"));
-			String contents = "";
-			String line = "";
-			while ((line = sourcefile.readLine()) != null) {
-				contents = contents + "\n" + line;
-			}
+		mCursor = cr.query(Uri.withAppendedPath(LevelDBProvider.CONTENT_URI, "fourthkey"), null, null, null, null);
+		if (mCursor != null) {
+			mCursor.moveToFirst();
+			String value = mCursor.getString(1);
+			tv.setText(value);
+			setContentView(tv);
+		}
+		
+		 ArrayList<String> keystoquery = new ArrayList<String>();
+		 try {
+		 AssetManager assetManager = getAssets();
+		 InputStream in = assetManager.open("sample.json");
+		 BufferedReader sourcefile = new BufferedReader(
+		 new InputStreamReader(in, "UTF-8"));
+		 String contents = "";
+		 String line = "";
+		 while ((line = sourcefile.readLine()) != null) {
+		 contents = contents + "\n" + line;
+		 }
 			sourcefile.close();
 			JSONObject json = new JSONObject(contents);
 			Iterator<String> keys = json.keys();
 			while (keys.hasNext()) {
 				String key = (String) keys.next();
 				keystoquery.add(key);
-				db.dbPut(key, json.get(key).toString());
+				
+				mContentValues.put("key", key);
+				mContentValues.put("value", json.get(key).toString());
+				mUri = cr.insert(LevelDBProvider.CONTENT_URI, mContentValues);
 			}
 
 			int j = json.length() - 1;
@@ -96,7 +195,8 @@ public class DBBenchmarkActivity extends Activity {
 			tv.setText("JSON problem" + e.getLocalizedMessage());
 			setContentView(tv);
 		}
-
+		 
+		 
 		/*
 		 * Query entries randomly
 		 */
@@ -106,7 +206,13 @@ public class DBBenchmarkActivity extends Activity {
 		Random randomGenerator = new Random();
 		for (int k = 0; k < querycount; k++) {
 			int randomKey = randomGenerator.nextInt(maxkey);
-			String it = db.dbGet(keystoquery.get(randomKey));
+			mCursor = cr.query(Uri.withAppendedPath(LevelDBProvider.CONTENT_URI, keystoquery.get(randomKey)), null, null, null, null);
+			if (mCursor != null) {
+				mCursor.moveToFirst();
+				String value = mCursor.getString(1);
+				tv.setText(value);
+				setContentView(tv);
+			}
 		}
 		long endtime = System.currentTimeMillis();
 		long querytime = (endtime - startime);
@@ -136,23 +242,23 @@ public class DBBenchmarkActivity extends Activity {
 	/*
 	 * Methods which wrap LevelDB calls, see jni/main.cc for details
 	 */
-//	public native String dbOpen(String dbpath);
-//
-//	public native String dbClose(String dbpath);
-//
-//	public native String dbPut(String key1, String value1);
-//
-//	public native String dbGet(String key1);
-//
-//	public native String dbDelete(String key1);
-//	
-//	public native String dbDestroy(String dbpath);
+	// public native String dbOpen(String dbpath);
+	//
+	// public native String dbClose(String dbpath);
+	//
+	// public native String dbPut(String key1, String value1);
+	//
+	// public native String dbGet(String key1);
+	//
+	// public native String dbDelete(String key1);
+	//
+	// public native String dbDestroy(String dbpath);
 
 	/*
 	 * A native method that is implemented by the 'hello-jni' native library,
 	 * which is packaged with this application.
 	 */
-//	public native String stringFromJNI();
+	// public native String stringFromJNI();
 
 	/*
 	 * This is another native method declaration that is *not* implemented by
@@ -164,7 +270,7 @@ public class DBBenchmarkActivity extends Activity {
 	 * Trying to call this function will result in a
 	 * java.lang.UnsatisfiedLinkError exception !
 	 */
-//	public native String unimplementedStringFromJNI();
+	// public native String unimplementedStringFromJNI();
 
 	/*
 	 * this is used to load the 'leveldb' library on application startup. The
@@ -172,9 +278,9 @@ public class DBBenchmarkActivity extends Activity {
 	 * /data/data/com.example.HelloJni/lib/libleveldb.so at installation time by
 	 * the package manager.
 	 */
-//	static {
-//		System.loadLibrary("leveldb");
-//	}
+	// static {
+	// System.loadLibrary("leveldb");
+	// }
 
 	@Override
 	protected void onPause() {
@@ -182,6 +288,6 @@ public class DBBenchmarkActivity extends Activity {
 		/*
 		 * Close the db in the onPause to not waste memory
 		 */
-		db.dbClose(mDBdir);
+		// db.dbClose(mDBdir);
 	}
 }

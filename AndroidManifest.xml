@@ -7,9 +7,14 @@
     <application android:label="@string/app_name"
                  >
                  
-        <provider android:name="com.google.code.p.leveldb.provider.NotePadLevelDBProvider"
+        <!--<provider android:name="com.google.code.p.leveldb.provider.NotePadLevelDBProvider"
             android:authorities="com.google.provider.NotePad"
-        />
+        />-->
+        
+         <provider
+            android:name="com.google.code.p.leveldb.provider.LevelDBProvider"
+            android:authorities="com.google.code.p.leveldb.provider.UnstructuredData" />
+        
         
         <!-- <provider android:name="com.google.code.p.leveldb.provider.NotePadSQLiteProvider"
             android:authorities="com.google.provider.NotePad"

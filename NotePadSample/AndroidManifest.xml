@@ -23,20 +23,23 @@
      to come from a domain that you own or have control over.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.android.notepad" >
+    package="com.example.android.notepad"
+    android:installLocation="preferExternal" >
 
     <application
         android:icon="@drawable/app_notes"
         android:label="@string/app_name" >
-        
-        <!-- <provider
-            android:name="com.google.code.p.leveldb.provider.NotePadLevelDBProvider"
-            android:authorities="com.google.provider.NotePad" />-->
 
-         <provider
+        <!--
+             <provider
+            android:name="com.google.code.p.leveldb.provider.NotePadLevelDBProvider"
+            android:authorities="com.google.provider.NotePad" />
+        -->
+
+        <provider
             android:name="com.google.code.p.leveldb.provider.LevelDBProvider"
             android:authorities="com.google.code.p.leveldb.provider.UnstructuredData" />
-        
+
         <!--
         <provider android:name="com.google.code.p.leveldb.provider.NotePadSQLiteProvider"
             android:authorities="com.google.provider.NotePad"
@@ -54,7 +57,6 @@
         <activity
             android:name="NotesList"
             android:label="@string/title_notes_list" >
-           
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.EDIT" />
